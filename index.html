@@ -28,22 +28,22 @@
         if (lat && lon && name) {
             const scene = document.querySelector('a-scene');
 
-            // Add AR marker (yellow sphere)
-            const marker = document.createElement('a-sphere');
+            // Add AR marker (custom flat sign image that always faces camera)
+            const marker = document.createElement('a-image');
+            marker.setAttribute('src', 'images/mymarker.png'); // ensure this exists in /images/
             marker.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon};`);
-            marker.setAttribute('radius', '1');
-            marker.setAttribute('color', 'yellow');
-            marker.setAttribute('scale', '1 1 1');
+            marker.setAttribute('scale', '10 10 10'); 
+            marker.setAttribute('look-at', '[gps-camera]'); // <-- always faces the camera
             scene.appendChild(marker);
 
-            // Add label above the marker
+            // Add label above the marker (also always faces camera)
             const label = document.createElement('a-text');
             label.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon};`);
             label.setAttribute('value', name);
-            label.setAttribute('look-at', '[gps-camera]');
             label.setAttribute('scale', '10 10 10');
             label.setAttribute('color', 'black');
-            label.setAttribute('position', '0 2 0'); // 2 meters above the sphere
+            label.setAttribute('position', '0 2 0'); // 2 meters above marker
+            label.setAttribute('look-at', '[gps-camera]'); // <-- always faces the camera
             scene.appendChild(label);
 
         } else {
