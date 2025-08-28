@@ -17,37 +17,47 @@
     </a-scene>
 
     <script>
-        // Read URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const lat = parseFloat(urlParams.get('lat'));
-        const lon = parseFloat(urlParams.get('lon'));
-        const name = urlParams.get('name');
+        let lat = parseFloat(urlParams.get('lat'));
+        let lon = parseFloat(urlParams.get('lon'));
+        let name = urlParams.get('name');
 
-        console.log('Lat:', lat, 'Lon:', lon, 'Name:', name);
+        const scene = document.querySelector('a-scene');
 
-        if (lat && lon && name) {
-            const scene = document.querySelector('a-scene');
-
-            // Add AR marker (custom flat sign image that always faces camera)
+        // Helper function to create marker + label
+        function addMarker(lat, lon, name) {
+            // Marker image
             const marker = document.createElement('a-image');
-            marker.setAttribute('src', 'images/mymarker.png'); // ensure this exists in /images/
-            marker.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon};`);
-            marker.setAttribute('scale', '10 10 10'); 
-            marker.setAttribute('look-at', '[gps-camera]'); // <-- always faces the camera
+            marker.setAttribute('src', 'images/mymarker.png'); // make sure this exists
+            marker.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon}`);
+            marker.setAttribute('scale', '10 10 10');
+            marker.setAttribute('look-at', '[gps-camera]');
             scene.appendChild(marker);
 
-            // Add label above the marker (also always faces camera)
+            // Label above the marker
             const label = document.createElement('a-text');
-            label.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon};`);
-            label.setAttribute('value', name);
+            label.setAttribute('gps-entity-place', `latitude: ${lat}; longitude: ${lon}`);
+            label.setAttribute('value', name || "Marker");
             label.setAttribute('scale', '10 10 10');
             label.setAttribute('color', 'black');
             label.setAttribute('position', '0 2 0'); // 2 meters above marker
-            label.setAttribute('look-at', '[gps-camera]'); // <-- always faces the camera
+            label.setAttribute('look-at', '[gps-camera]');
             scene.appendChild(label);
+        }
 
+        if (lat && lon && name) {
+            // If URL provides coordinates, use them
+            addMarker(lat, lon, name);
         } else {
-            console.log('No coordinates or name provided in URL');
+            // Otherwise, use current device location (good for testing)
+            navigator.geolocation.getCurrentPosition((pos) => {
+                lat = pos.coords.latitude;
+                lon = pos.coords.longitude;
+                name = "Test Marker"; // temporary label
+                addMarker(lat, lon, name);
+            }, (err) => {
+                console.error("Error getting device location:", err);
+            }, { enableHighAccuracy: true });
         }
     </script>
 </body>
